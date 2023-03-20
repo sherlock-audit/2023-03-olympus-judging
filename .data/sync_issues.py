@@ -137,7 +137,7 @@ def process_directory(repo, path):
                 "Issue %s does not have a primary file (-best.md)." % item.path
             )
 
-        if parent:
+        if parent and not closed:
             for issue_id in dir_issues_ids:
                 if issue_id != parent:
                     issues[parent]["has_duplicates"] = True
