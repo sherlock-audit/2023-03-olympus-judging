@@ -92,6 +92,22 @@ Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/3/files
 
 
 
+
+
+## Discussion
+
+**0xLienid**
+
+This is kind of similar to #029 in terms of underlying cause (knowledge of oracle update price)
+
+**0xLienid**
+
+Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/3/files
+
+**IAm0x52**
+
+Fix looks good. Contract now enforces delay between deposit and withdrawal
+
 # Issue H-2: minTokenAmounts_ is useless in new configuration and doesn't provide any real slippage protection 
 
 Source: https://github.com/sherlock-audit/2023-03-olympus-judging/issues/3 
@@ -208,6 +224,86 @@ I.e. the reason we protect pool swaps with slippage parameters is not present in
 
 
 
+
+
+## Discussion
+
+**0xLienid**
+
+This is true, I'm not sure it would matter much in practice since there's no real economic incentive for anyone but the Treasury to do this. That said, it's a relatively easy fix so I think it's worth including anyways.
+
+**0xLienid**
+
+Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/11/files
+
+**cducrest**
+
+Escalate for 10 USDC
+
+Disagree with severity, probably medium or even low. The main reason slippage protection is needed in exchange is because of sandwich attacks that directly and instantly impact the price on the pool. Here the issue points to a lack of slippage protection with regards to the oracle price which cannot be impacted by an outsider. 
+
+Since there is slippage protection on the pool withdraw, the vault withdraw tx cannot be sandwiched for profit (or grief). It is just a nice to have.
+
+**sherlock-admin**
+
+ > Escalate for 10 USDC
+> 
+> Disagree with severity, probably medium or even low. The main reason slippage protection is needed in exchange is because of sandwich attacks that directly and instantly impact the price on the pool. Here the issue points to a lack of slippage protection with regards to the oracle price which cannot be impacted by an outsider. 
+> 
+> Since there is slippage protection on the pool withdraw, the vault withdraw tx cannot be sandwiched for profit (or grief). It is just a nice to have.
+
+You've created a valid escalation for 10 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**IAm0x52**
+
+Escalate for 10 USDC
+
+Disagree with the above comment. Since skimming of arb happens AFTER pool slippage checks the user would still lose funds.
+
+**sherlock-admin**
+
+ > Escalate for 10 USDC
+> 
+> Disagree with the above comment. Since skimming of arb happens AFTER pool slippage checks the user would still lose funds.
+
+You've created a valid escalation for 10 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**cducrest**
+
+The user may lose funds, if the arbs relative to the oracle price are to his disfavour. I agree with that. But whether it is to his disfavour or not cannot be impacted by an outsider. Additionally, the user can know in advance that he will be subjected to arbs by checking the oracle/real life asset price. This is not analogous to a dex swap using a pool of which the state can be influenced by a previous transaction (front-run / sandwich attack).
+
+I.e. the reason we protect pool swaps with slippage parameters is not present in the arb relative to the oracle price.
+
+**hrishibhat**
+
+Escalation accepted
+
+Considering this issue as a valid high
+Accepting the 2nd escalation. After further internal discussion considering the issue as is because there can loss due to a mismatch in oracle and pool price, there should be slippage protections on the final amount to protect the user. 
+
+**sherlock-admin**
+
+> Escalation accepted
+> 
+> Considering this issue as a valid high
+> Accepting the 2nd escalation. After further internal discussion considering the issue as is because there can loss due to a mismatch in oracle and pool price, there should be slippage protections on the final amount to protect the user. 
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+**IAm0x52**
+
+Fix looks good. Added a secondary input to allow user to specify minimum wstETH
+
 # Issue H-3: Adversary can stake LP directly for the vault then withdraw to break lp accounting in BLVaultManagerLido 
 
 Source: https://github.com/sherlock-audit/2023-03-olympus-judging/issues/4 
@@ -286,6 +382,18 @@ Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/5/files
 
 
 
+
+
+## Discussion
+
+**0xLienid**
+
+Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/5/files
+
+**IAm0x52**
+
+Fix looks good. Optionally lpBalance could be removed
+
 # Issue H-4: Users can abuse discrepancies between oracle and true asset price to mint more OHM than needed and profit from it 
 
 Source: https://github.com/sherlock-audit/2023-03-olympus-judging/issues/5 
@@ -362,6 +470,22 @@ Similar underlying issues to #027 and #051. Solving one should solve all of them
 Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/8/files
 
 
+
+
+
+## Discussion
+
+**0xLienid**
+
+Similar underlying issues to #027 and #051. Solving one should solve all of them.
+
+**0xLienid**
+
+Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/8/files
+
+**IAm0x52**
+
+Fix looks good. Contract now uses the lesser of pool and oracle price to determine how much OHM to mint
 
 # Issue M-1: stETH/ETH chainlink oracle has too long of heartbeat and deviation threshold which can cause loss of funds 
 
@@ -499,6 +623,80 @@ Contestants' payouts and scores will be updated according to the changes made on
 
 
 
+
+
+## Discussion
+
+**0xLienid**
+
+Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/6/files
+
+**cducrest**
+
+Escalate for 10 USDC
+
+Disagree with severity, probably medium or low. The sherlock docs for high severity states: "The vulnerability must be something that is not considered an acceptable risk by a reasonable protocol team." The provided fix arguably lowers the risk by 2: we go from 2% deviation threshold to 1% by changing oracle.
+
+If having 2% deviation is unacceptable, I don't see how having 1% is acceptable.
+
+Additionally, the user is able to notice when the price oracle deviate from the real value of the asset, and this value cannot be influenced by an attacker.
+
+**sherlock-admin**
+
+ > Escalate for 10 USDC
+> 
+> Disagree with severity, probably medium or low. The sherlock docs for high severity states: "The vulnerability must be something that is not considered an acceptable risk by a reasonable protocol team." The provided fix arguably lowers the risk by 2: we go from 2% deviation threshold to 1% by changing oracle.
+> 
+> If having 2% deviation is unacceptable, I don't see how having 1% is acceptable.
+> 
+> Additionally, the user is able to notice when the price oracle deviate from the real value of the asset, and this value cannot be influenced by an attacker.
+
+You've created a valid escalation for 10 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**IAm0x52**
+
+Escalate for 10 USDC
+
+Disagree with the comment above. Sponsor has clearly accepted issue and has not disagreed with severity, which indicates they do not consider it an acceptable risk
+
+**sherlock-admin**
+
+ > Escalate for 10 USDC
+> 
+> Disagree with the comment above. Sponsor has clearly accepted issue and has not disagreed with severity, which indicates they do not consider it an acceptable risk
+
+You've created a valid escalation for 10 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**hrishibhat**
+
+Escalation accepted
+
+Accepting the first escalation as the severity of this impact can be considered medium based on the escalation 
+
+
+**sherlock-admin**
+
+> Escalation accepted
+> 
+> Accepting the first escalation as the severity of this impact can be considered medium based on the escalation 
+> 
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+**IAm0x52**
+
+Fix looks good. Now uses steth/usd and eth/usd oracles in place of steth/eth oracles to reduce delay and deviation
+
 # Issue M-2: Normal users could be inadvertently grieved by the withdrawn ratios check 
 
 Source: https://github.com/sherlock-audit/2023-03-olympus-judging/issues/28 
@@ -559,6 +757,18 @@ True, but this will be very very minor in practice. It relies on assuming no arb
 
 
 
+
+
+## Discussion
+
+**0xLienid**
+
+True, but this will be very very minor in practice. It relies on assuming no arbitrage is ever taken, it will also be helped (but not eliminated) by the solution to #003
+
+**IAm0x52**
+
+Sponsor has acknowledged and accepted this risk
+
 # Issue M-3: SetLimit does not take into account burned OHM 
 
 Source: https://github.com/sherlock-audit/2023-03-olympus-judging/issues/48 
@@ -604,4 +814,20 @@ Same issue as #018
 Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/2/files
 
 
+
+
+
+## Discussion
+
+**0xLienid**
+
+Same issue as #018
+
+**0xLienid**
+
+Fix Implementation: https://github.com/0xLienid/sherlock-olympus/pull/2/files
+
+**IAm0x52**
+
+Fix looks good. setLimit now properly accounts for circulatingOhmBurned
 
